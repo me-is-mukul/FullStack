@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found - QuestForge{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="h3">404 - Page not found</h1>
+  <p class="text-muted">The page does not exist, or it belongs to another user.</p>
+  <a class="btn btn-primary" href="{% url 'home' %}">Go to home page</a>
+</div>
+{% endblock %}

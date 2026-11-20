@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Sign up - QuestForge{% endblock %}
+
+{% block content %}
+<div class="narrow-box">
+  <div class="card">
+    <div class="card-body p-4">
+      <h1 class="h4 mb-3">Create an account</h1>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "includes/form_fields.html" with form=form %}
+        <button class="btn btn-primary w-100" type="submit">Sign up</button>
+      </form>
+    </div>
+  </div>
+  <p class="text-center text-muted mt-3">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+</div>
+{% endblock %}

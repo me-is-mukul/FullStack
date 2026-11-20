@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quest.title }} - QuestForge{% endblock %}
+
+{% block content %}
+<p><a href="{% url 'quests:list' %}">&larr; Back to my quests</a></p>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="mb-2">{% include "includes/quest_badges.html" %}</div>
+        <h1 class="h3">{{ quest.title }}</h1>
+        {% if quest.description %}
+        <p class="mb-0">{{ quest.description|linebreaksbr }}</p>
+        {% else %}
+        <p class="text-muted mb-0">No description.</p>
+        {% endif %}
+      </div>
+      <table class="table mb-0">
+        <tr><th class="text-muted fw-normal ps-3" style="width: 35%;">Category</th><td>{{ quest.category.name|default:"No category" }}</td></tr>
+        <tr><th class="text-muted fw-normal ps-3">Deadline</th><td>{{ quest.deadline|date:"j M Y"|default:"No deadline" }}</td></tr>
+        <tr><th class="text-muted fw-normal ps-3">Created</th><td>{{ quest.created_at|date:"j M Y, H:i" }}</td></tr>
+        {% if quest.is_completed %}
+        <tr><th class="text-muted fw-normal ps-3">Completed</th><td>{{ quest.completed_at|date:"j M Y, H:i" }}</td></tr>
+        {% endif %}
+      </table>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        {% if quest.is_completed %}
+        <p class="mb-1 text-muted">XP earned</p>
+        <p class="h3 mb-3">+{{ quest.xp_earned }} XP</p>
+        {% else %}
+        <p class="mb-1 text-muted">Reward for completing</p>
+        <p class="h3 mb-3">{{ quest.xp_reward }} XP</p>
+
+        <form method="post" action="{% url 'quests:complete' quest.pk %}" class="mb-2">
+          {% csrf_token %}
+          <button class="btn btn-primary w-100" type="submit">Mark as complete</button>
+        </form>
+        {% if quest.status == "pending" %}
+        <form method="post" action="{% url 'quests:start' quest.pk %}" class="mb-2">
+          {% csrf_token %}
+          <button class="btn btn-outline-primary w-100" type="submit">Start quest</button>
+        </form>
+        {% endif %}
+        {% endif %}
+
+        <a class="btn btn-light w-100 mb-2" href="{% url 'quests:update' quest.pk %}">Edit</a>
+        <a class="btn btn-outline-danger w-100" href="{% url 'quests:delete' quest.pk %}">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

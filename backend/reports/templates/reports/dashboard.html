@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - QuestForge{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="page-title mb-0">Hello, {{ profile.name }}</h1>
+  <a class="btn btn-primary" href="{% url 'quests:create' %}">+ New quest</a>
+</div>
+
+{# Summary numbers #}
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <span class="stat-label">Level</span>
+          <span class="text-muted small">{{ level.total_xp }} XP in total</span>
+        </div>
+        <div class="stat-number">{{ level.level }}</div>
+        <div class="progress mt-2" role="progressbar" aria-label="Progress to next level" aria-valuenow="{{ level.percent }}" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar" style="width: {{ level.percent }}%"></div>
+        </div>
+        <div class="small text-muted mt-1">{{ level.xp_to_next }} XP to level {{ level.level|add:1 }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <span class="stat-label">Current streak</span>
+        <div class="stat-number">{{ profile.streak_today }}</div>
+        <div class="small text-muted">day{{ profile.streak_today|pluralize }} &middot; best {{ profile.longest_streak }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card h-100">
+      <div class="card-body">
+        <span class="stat-label">Quests completed</span>
+        <div class="stat-number">{{ counts.completed }}</div>
+        <div class="small text-muted">{{ counts.pending }} pending &middot; {{ counts.in_progress }} in progress</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between">
+        Upcoming deadlines <a href="{% url 'quests:list' %}?sort=deadline">See all</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for quest in upcoming %}
+        <li class="list-group-item d-flex justify-content-between">
+          <a href="{% url 'quests:detail' quest.pk %}">{{ quest.title }}</a>
+          <span class="{% if quest.is_overdue %}text-danger{% else %}text-muted{% endif %} small">
+            {% if quest.is_overdue %}Overdue, {% endif %}{{ quest.deadline|date:"j M" }}
+          </span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">No open quests with a deadline.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card h-100">
+      <div class="card-header">Recently completed</div>
+      <ul class="list-group list-group-flush">
+        {% for quest in recently_completed %}
+        <li class="list-group-item d-flex justify-content-between">
+          <a href="{% url 'quests:detail' quest.pk %}">{{ quest.title }}</a>
+          <span class="small">+{{ quest.xp_earned }} XP</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">Complete a quest to earn your first XP.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        Latest achievements <a href="{% url 'achievements:list' %}">See all</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for item in recent_achievements %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span><strong>{{ item.achievement.name }}</strong> <span class="text-muted">- {{ item.achievement.description }}</span></span>
+          <span class="text-muted small">{{ item.unlocked_at|date:"j M Y" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">No achievements yet. Your first completed quest unlocks one.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

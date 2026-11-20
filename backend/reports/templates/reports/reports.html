@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My reports - QuestForge{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="page-title mb-0">My reports</h1>
+  <a class="btn btn-outline-primary" href="{% url 'reports:export' %}">Download quests (CSV)</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3"><div class="card card-body"><span class="stat-label">Total XP</span><div class="stat-number">{{ level.total_xp }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card card-body"><span class="stat-label">XP, last {{ chart_days }} days</span><div class="stat-number">{{ xp_last_30_days }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card card-body"><span class="stat-label">Quests created</span><div class="stat-number">{{ counts.total }}</div></div></div>
+  <div class="col-6 col-md-3"><div class="card card-body"><span class="stat-label">Quests completed</span><div class="stat-number">{{ counts.completed }}</div></div></div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">XP earned per day (last {{ chart_days }} days)</div>
+  <div class="card-body">
+    <div class="chart-box"><canvas id="xp-chart"></canvas></div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header">Quests by category</div>
+      <div class="card-body">
+        {% if by_category %}
+        <div class="chart-box"><canvas id="category-chart"></canvas></div>
+        {% else %}
+        <p class="text-muted mb-0">No quests yet.</p>
+        {% endif %}
+      </div>
+      {% if by_category %}
+      <table class="table mb-0">
+        <thead><tr><th class="ps-3">Category</th><th class="text-end">Quests</th><th class="text-end">Completed</th><th class="text-end pe-3">XP</th></tr></thead>
+        <tbody>
+          {% for row in by_category %}
+          <tr>
+            <td class="ps-3">{{ row.category__name|default:"No category" }}</td>
+            <td class="text-end">{{ row.total }}</td>
+            <td class="text-end">{{ row.completed }}</td>
+            <td class="text-end pe-3">{{ row.xp }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header">Quests by difficulty</div>
+      <table class="table mb-0">
+        <thead><tr><th class="ps-3">Difficulty</th><th class="text-end">XP each</th><th class="text-end">Quests</th><th class="text-end pe-3">Completed</th></tr></thead>
+        <tbody>
+          {% for row in by_difficulty %}
+          <tr>
+            <td class="ps-3">{{ row.label }}</td>
+            <td class="text-end">{{ row.xp_each }}</td>
+            <td class="text-end">{{ row.total }}</td>
+            <td class="text-end pe-3">{{ row.completed }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{# json_script safely puts Python data into the page for charts.js to read. #}
+{{ xp_chart|json_script:"xp-chart-data" }}
+{{ category_chart|json_script:"category-chart-data" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script src="{% static 'js/charts.js' %}"></script>
+{% endblock %}

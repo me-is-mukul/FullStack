@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Leaderboard - QuestForge{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="page-title mb-1">Leaderboard</h1>
+    <p class="text-muted mb-0">Ranked by total XP, then by quests completed.</p>
+  </div>
+  {% if my_rank %}<span class="fw-semibold">Your rank: #{{ my_rank }}</span>{% endif %}
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th class="ps-3" style="width: 6rem;">Rank</th>
+          <th>Player</th>
+          <th class="text-end">Quests completed</th>
+          <th class="text-end pe-3">Total XP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for player in page.object_list %}
+        <tr{% if player.pk == user.pk %} class="my-row"{% endif %}>
+          <td class="ps-3">{{ rank_offset|add:forloop.counter }}</td>
+          <td>{{ player.username }}{% if player.pk == user.pk %} <span class="text-muted">(you)</span>{% endif %}</td>
+          <td class="text-end">{{ player.completed_count }}</td>
+          <td class="text-end pe-3 fw-semibold">{{ player.total_xp }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include "includes/pagination.html" with page=page %}
+{% endblock %}

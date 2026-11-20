@@ -1,0 +1,21 @@
+{% comment %}
+  Renders every field of `form` with its label, help text and errors.
+  Usage: {% include "includes/form_fields.html" with form=some_form %}
+{% endcomment %}
+{% if form.non_field_errors %}
+<div class="alert alert-danger">
+  {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+</div>
+{% endif %}
+
+{% for field in form %}
+<div class="form-field mb-3">
+  <label class="form-label" for="{{ field.id_for_label }}">
+    {{ field.label }}{% if not field.field.required %} <span class="text-muted">(optional)</span>{% endif %}
+  </label>
+  {{ field }}
+  {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+  {# help_text is written by us or by Django (password rules), never by users #}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+</div>
+{% endfor %}

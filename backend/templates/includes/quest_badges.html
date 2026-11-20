@@ -1,0 +1,3 @@
+<span class="badge badge-{{ quest.difficulty }}">{{ quest.get_difficulty_display }}</span>
+<span class="badge badge-{{ quest.status }}">{{ quest.get_status_display }}</span>
+{% if quest.is_overdue %}<span class="badge badge-overdue">Overdue</span>{% endif %}

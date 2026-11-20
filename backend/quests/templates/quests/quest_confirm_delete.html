@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Delete quest - QuestForge{% endblock %}
+
+{% block content %}
+<div class="narrow-box">
+  <div class="card">
+    <div class="card-body p-4">
+      <h1 class="h4">Delete this quest?</h1>
+      <p>&ldquo;{{ quest.title }}&rdquo; will be removed permanently.</p>
+      {% if quest.is_completed %}
+      <p class="text-muted">It is completed, so the {{ quest.xp_earned }} XP it earned will be removed from your total too.</p>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Yes, delete</button>
+        <a class="btn btn-light" href="{% url 'quests:detail' quest.pk %}">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

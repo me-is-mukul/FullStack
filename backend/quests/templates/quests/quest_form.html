@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - QuestForge{% endblock %}
+
+{% block content %}
+<div class="narrow-box wide">
+  <h1 class="page-title">{{ title }}</h1>
+  <div class="card">
+    <div class="card-body">
+      {% if quest.is_completed %}
+      <div class="alert alert-info">This quest is completed. You can change its details, but the XP it earned stays the same.</div>
+      {% endif %}
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "includes/form_fields.html" with form=form %}
+        <button class="btn btn-primary" type="submit">Save</button>
+        {% if quest %}
+        <a class="btn btn-light" href="{% url 'quests:detail' quest.pk %}">Cancel</a>
+        {% else %}
+        <a class="btn btn-light" href="{% url 'quests:list' %}">Cancel</a>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

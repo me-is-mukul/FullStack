@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}My profile - QuestForge{% endblock %}
+
+{% block content %}
+<h1 class="page-title">My profile</h1>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5 mb-1">{{ profile.name }}</h2>
+        <p class="text-muted mb-2">@{{ user.username }}</p>
+        {% if profile.bio %}<p>{{ profile.bio }}</p>{% endif %}
+        <table class="table table-sm mb-0">
+          <tr><td class="text-muted">Email</td><td>{{ user.email|default:"-" }}</td></tr>
+          <tr><td class="text-muted">Member since</td><td>{{ user.date_joined|date:"j M Y" }}</td></tr>
+          <tr><td class="text-muted">Current streak</td><td>{{ profile.streak_today }} day{{ profile.streak_today|pluralize }}</td></tr>
+          <tr><td class="text-muted">Longest streak</td><td>{{ profile.longest_streak }} day{{ profile.longest_streak|pluralize }}</td></tr>
+        </table>
+      </div>
+    </div>
+    <a class="btn btn-outline-primary w-100 mt-3" href="{% url 'password_change' %}">Change password</a>
+  </div>
+
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">Edit profile</div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "includes/form_fields.html" with form=user_form %}
+          {% include "includes/form_fields.html" with form=profile_form %}
+          <button class="btn btn-primary" type="submit">Save changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}My quests - QuestForge{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="page-title mb-1">My quests</h1>
+    <p class="text-muted mb-0">
+      {{ counts.total }} total &middot; {{ counts.pending }} pending &middot;
+      {{ counts.in_progress }} in progress &middot; {{ counts.completed }} completed
+    </p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'quests:create' %}">+ New quest</a>
+</div>
+
+{# Search and filter form. It uses GET, so the choices show up in the URL. #}
+<form method="get" class="card card-body mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label" for="q">Search</label>
+      <input class="form-control" type="search" id="q" name="q" value="{{ query }}" placeholder="Title or description">
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label" for="status">Status</label>
+      <select class="form-select" id="status" name="status">
+        <option value="">All</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label" for="category">Category</label>
+      <select class="form-select" id="category" name="category">
+        <option value="">All</option>
+        {% for cat in categories %}
+        <option value="{{ cat.pk }}"{% if cat.pk|stringformat:"d" == category %} selected{% endif %}>{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label" for="difficulty">Difficulty</label>
+      <select class="form-select" id="difficulty" name="difficulty">
+        <option value="">All</option>
+        {% for value, label in difficulty_choices %}
+        <option value="{{ value }}"{% if value == difficulty %} selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label" for="sort">Sort by</label>
+      <select class="form-select" id="sort" name="sort">
+        <option value="newest"{% if sort == "newest" %} selected{% endif %}>Newest first</option>
+        <option value="oldest"{% if sort == "oldest" %} selected{% endif %}>Oldest first</option>
+        <option value="deadline"{% if sort == "deadline" %} selected{% endif %}>Deadline</option>
+        <option value="title"{% if sort == "title" %} selected{% endif %}>Title (A-Z)</option>
+      </select>
+    </div>
+    <div class="col-md-1 d-grid">
+      <button class="btn btn-outline-primary" type="submit">Go</button>
+    </div>
+  </div>
+  {% if is_filtered %}<a class="small mt-2" href="{% url 'quests:list' %}">Clear filters</a>{% endif %}
+</form>
+
+<div class="card">
+  {% if page.object_list %}
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Quest</th>
+          <th>Category</th>
+          <th>Difficulty</th>
+          <th>Status</th>
+          <th>Deadline</th>
+          <th class="text-end">XP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for quest in page.object_list %}
+        <tr>
+          <td><a href="{% url 'quests:detail' quest.pk %}">{{ quest.title }}</a></td>
+          <td>{{ quest.category.name|default:"-" }}</td>
+          <td><span class="badge badge-{{ quest.difficulty }}">{{ quest.get_difficulty_display }}</span></td>
+          <td>
+            <span class="badge badge-{{ quest.status }}">{{ quest.get_status_display }}</span>
+            {% if quest.is_overdue %}<span class="badge badge-overdue">Overdue</span>{% endif %}
+          </td>
+          <td>{{ quest.deadline|date:"j M Y"|default:"-" }}</td>
+          <td class="text-end">{% if quest.is_completed %}+{{ quest.xp_earned }}{% else %}<span class="text-muted">{{ quest.xp_reward }}</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif is_filtered %}
+  <div class="card-body text-center text-muted">No quests match these filters.</div>
+  {% else %}
+  <div class="card-body text-center">
+    <p class="text-muted">You have no quests yet.</p>
+    <a class="btn btn-primary" href="{% url 'quests:create' %}">Create your first quest</a>
+  </div>
+  {% endif %}
+</div>
+
+{% include "includes/pagination.html" with page=page %}
+{% endblock %}

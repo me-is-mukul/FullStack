@@ -1,0 +1,49 @@
+{% with app=request.resolver_match.app_name page=request.resolver_match.url_name %}
+<nav class="navbar navbar-expand-lg bg-white border-bottom">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">QuestForge</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav"
+            aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="main-nav">
+      {% if user.is_authenticated %}
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link{% if page == 'dashboard' %} active{% endif %}" href="{% url 'reports:dashboard' %}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link{% if app == 'quests' %} active{% endif %}" href="{% url 'quests:list' %}">Quests</a></li>
+        <li class="nav-item"><a class="nav-link{% if app == 'achievements' %} active{% endif %}" href="{% url 'achievements:list' %}">Achievements</a></li>
+        <li class="nav-item"><a class="nav-link{% if page == 'leaderboard' %} active{% endif %}" href="{% url 'reports:leaderboard' %}">Leaderboard</a></li>
+        <li class="nav-item"><a class="nav-link{% if page == 'reports' %} active{% endif %}" href="{% url 'reports:reports' %}">Reports</a></li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ user.username }}</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="{% url 'profile' %}">My profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'password_change' %}">Change password</a></li>
+            {% if user.is_staff %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'reports:staff' %}">Staff report</a></li>
+            <li><a class="dropdown-item" href="{% url 'admin:index' %}">Admin site</a></li>
+            {% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="dropdown-item" type="submit">Log out</button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      {% else %}
+      <div class="ms-auto d-flex gap-2">
+        <a class="btn btn-outline-primary btn-sm" href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'register' %}">Sign up</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+{% endwith %}
